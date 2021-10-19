@@ -1,3 +1,11 @@
 <template>
-    
+  <lightning-file-upload
+      label="Upload Sensors"
+      name="fileUploader"
+      accept="{acceptedFormats}"
+      record-id="{recordId}"
+      onuploadfinished="{handleUploadFinished}"
+      multiple
+  >
+  </lightning-file-upload>
 </template>
