@@ -1,11 +1,26 @@
 <template>
-  <lightning-file-upload
-      label="Upload Sensors"
+  <lightning-card title="Upload Sensors" icon-name="custom:custom31">
+    <lightning-file-upload
       name="fileUploader"
-      accept="{acceptedFormats}"
-      record-id="{recordId}"
-      onuploadfinished="{handleUploadFinished}"
+      accept={acceptedFormats}
+      record-id={recordId}
+      onuploadfinished={handleUploadFinished}
       multiple
-  >
-  </lightning-file-upload>
+    >
+    </lightning-file-upload>
+  </lightning-card>
+
+  <div if:true={data}>
+    <lightning-datatable
+      key-field="id"
+      data={data}
+      columns={columns}
+      onrowaction={deleteRow}
+    >
+    </lightning-datatable>
+  </div>
+
+  <div if:true={error}>
+    {error}
+  </div>
 </template>
