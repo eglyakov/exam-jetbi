@@ -11,7 +11,7 @@ public with sharing class ParkingController {
         Sensor__c sensorObj = new Sensor__c();
         List<String> csvRecordItems = csvRecordsList[i].split(',');
         sensorObj.Base_Station__c = [SELECT ID FROM Base_Station__c WHERE Name =: csvRecordItems[0]].id;
-        sensorObj.Sensor_model__c = csvRecordItems[1];
+        sensorObj.Sensor_Model__c = csvRecordItems[1];
         sensorObj.Status__c = csvRecordItems[2];
         sensorsList.add(sensorObj);
       }

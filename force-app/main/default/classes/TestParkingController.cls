@@ -1,6 +1,6 @@
 @isTest
 public class TestParkingController {
-  public static String str = 'Sensor id,Sensor model,Status,Base Station \n' +
+  public static String str = 'Sensor id,Sensor Model,Status,Base Station \n' +
                               '1,Mark 1,Inactive,Freedom97 \n' +
                               '2,Mark 3,Inactive,DontTouch';
 
