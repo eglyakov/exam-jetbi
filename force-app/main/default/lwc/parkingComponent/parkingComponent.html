@@ -5,8 +5,7 @@
       accept={acceptedFormats}
       record-id={recordId}
       onuploadfinished={handleUploadFinished}
-      multiple
-    >
+      multiple>
     </lightning-file-upload>
   </lightning-card>
 
@@ -14,13 +13,22 @@
     <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
   </template>
 
+  <!-- <lightning-combobox
+    name="Number of records"
+    label="Show number of records:"
+    value={value}
+    placeholder="Select number of records"
+    options={comboboxOptions}
+    onchange={handleComboboxChange} >
+  </lightning-combobox> -->
+
   <div if:true={data}>
     <lightning-datatable
       key-field="id"
       data={data}
       columns={columns}
       onrowaction={deleteRow}
-    >
+      hide-checkbox-column="true">
     </lightning-datatable>
   </div>
 

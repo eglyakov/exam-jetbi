@@ -13,13 +13,22 @@ const COLUMNS = [
   },
 ];
 
+// const ComboboxOptions = [
+//   { label: '10', value: '10' },
+//   { label: '25', value: '25' },
+//   { label: '50', value: '50' },
+//   { label: '100', value: '100' },
+//   { label: '200', value: '200' },
+// ];
+
 export default class ParkingComponent extends LightningElement {
   @api recordId;
   @track data = [];
+  @track dataPerPage = [];
   @track error;
-  @track isSpinner = false;
   @track columns = COLUMNS;
-
+  @track isSpinner = false;
+  
   get acceptedFormats() {
     return ['.csv'];
   }
@@ -27,11 +36,19 @@ export default class ParkingComponent extends LightningElement {
   connectedCallback() {
     this.isSpinner = true;
   }
+
   @wire(getSensorsList) fetchSensorsList(result) {
     this.isSpinner = false;
     if (result.data) {
+      let obj=JSON.parse(JSON.stringify(result));
+      console.log(obj);
+      console.log(result.data);
+      console.log(result);
+
+
       this.data = result.data;
       this.error = undefined;
+      this.showData(result.data)
     } else if (result.error) {
       this.error = result.error;
       this.data = [];
