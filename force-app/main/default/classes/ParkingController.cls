@@ -1,4 +1,9 @@
 public with sharing class ParkingController {
+  @AuraEnabled(cacheable=true)
+  public static List<Sensor__c> getSensorsList(){
+    return [SELECT Sensor_Model__c, Status__c, Base_Station__c  FROM Sensor__c];
+  }
+
   @AuraEnabled
   public static List<Sensor__c> readCSVFile(ID contentDocumentId){
     List<Sensor__c> sensorsList = new List<Sensor__c>();
@@ -17,7 +22,6 @@ public with sharing class ParkingController {
         sensorObj.Status__c = csvRecordItems[2];
         sensorsList.add(sensorObj);
       }
-      System.debug(sensorsList);
   
       try {
         if(!sensorsList.isEmpty()) {
@@ -29,5 +33,10 @@ public with sharing class ParkingController {
     }
 
     return sensorsList;
+  }
+
+  @AuraEnabled
+  public static void deleteRecord(ID contentDocumentId){
+    // System.debug(contentDocumentId);
   }
 }

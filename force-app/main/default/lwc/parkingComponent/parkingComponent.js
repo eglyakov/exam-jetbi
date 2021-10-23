@@ -1,5 +1,7 @@
 import { LightningElement, track, api, wire } from 'lwc';
+import getSensorsList from '@salesforce/apex/ParkingController.getSensorsList';
 import readCSVFile from '@salesforce/apex/ParkingController.readCSVFile';
+
 
 const COLUMNS = [
   {label: "Sensor Model", fieldName: "Sensor_Model__c"},
@@ -15,19 +17,26 @@ export default class ParkingComponent extends LightningElement {
   @api recordId;
   @track data = [];
   @track error;
+  @track isSpinner = false;
   @track columns = COLUMNS;
 
   get acceptedFormats() {
     return ['.csv'];
   }
 
-  // @wire(readCSVFile, {recordId: '$recordId', fields: ['Sensor__c.Base_Station__c']})
-  // sensors;
-
-  // handleUploadFinished(event) {
-  //   console.log(this.sensors);
-  //   console.log(this.sensors.data);
-  // }
+  connectedCallback() {
+    this.isSpinner = true;
+  }
+  @wire(getSensorsList) fetchSensorsList(result) {
+    this.isSpinner = false;
+    if (result.data) {
+      this.data = result.data;
+      this.error = undefined;
+    } else if (result.error) {
+      this.error = result.error;
+      this.data = [];
+    }
+  }
 
   handleUploadFinished(event) {
     const uploadedFiles = event.detail.files;
@@ -51,7 +60,7 @@ export default class ParkingComponent extends LightningElement {
       //   return {...row, BaseStationName: row.Base_Station__r.Name}
       // });
       this.data = result;
-      console.log(this.data);
+      // console.log(this.data);
     })
     .catch(err => {
       this.error = err;
@@ -59,10 +68,9 @@ export default class ParkingComponent extends LightningElement {
     
   }
 
-  deleteRow(row) {
-    const { id } = row;
+  deleteRow(event) {
+    const { id } = event.detail.row;
     const index = this.findRowIndexById(id);
-
     if (index !== -1) {
       this.data = this.data
         .slice(0, index)
@@ -72,6 +80,7 @@ export default class ParkingComponent extends LightningElement {
 
   findRowIndexById(id) {
     let ret = -1;
+    console.log(id)
     this.data.some((row, index) => {
       if (row.id === id) {
         ret = index;
