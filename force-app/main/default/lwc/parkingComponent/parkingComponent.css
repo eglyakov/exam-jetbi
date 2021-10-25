@@ -1,0 +1,21 @@
+.paginator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.combobox {
+  display: flex;
+  align-items: center;
+}
+.combobox__select {
+  margin: -18px 5px 0;
+  width: 70px;
+}
+
+.page-num {
+  border: 1px solid rgb(221, 219, 218); 
+  border-radius: 3px; 
+  padding: 2px 4px;
+}

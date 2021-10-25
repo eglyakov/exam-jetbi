@@ -1,38 +1,61 @@
 <template>
-  <lightning-card title="Upload Sensors" icon-name="custom:custom31">
-    <lightning-file-upload
-      name="fileUploader"
-      accept={acceptedFormats}
-      record-id={recordId}
-      onuploadfinished={handleUploadFinished}
-      multiple>
-    </lightning-file-upload>
+  <lightning-card title="Upload Sensors" icon-name="standard:logging">
+    <div class="slds-m-around_medium">
+      <lightning-file-upload
+        name="fileUploader"
+        accept={acceptedFormats}
+        record-id={recordId}
+        onuploadfinished={handleUploadFinished}
+        multiple>
+      </lightning-file-upload>
+    </div>
   </lightning-card>
 
-  <template if:true={isSpinner}>
-    <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
-  </template>
-
-  <!-- <lightning-combobox
-    name="Number of records"
-    label="Show number of records:"
-    value={value}
-    placeholder="Select number of records"
-    options={comboboxOptions}
-    onchange={handleComboboxChange} >
-  </lightning-combobox> -->
-
-  <div if:true={data}>
-    <lightning-datatable
-      key-field="id"
-      data={data}
-      columns={columns}
-      onrowaction={deleteRow}
-      hide-checkbox-column="true">
-    </lightning-datatable>
-  </div>
-
-  <div if:true={error}>
-    {error}
+  <div style="margin-top: 1rem;">
+    <lightning-card if:true={data} title="Sensors list" icon-name="standard:budget">
+      <div class="slds-m-around_medium paginator">
+        <div class="combobox">
+          <p>Show:</p>
+          <lightning-combobox class="combobox__select"
+            name="Number of records"
+            value={pageSize}
+            placeholder="Select number of records"
+            options={comboboxOptions}
+            onchange={comboboxChangeHandler} >
+          </lightning-combobox>
+          <p>recods</p>
+        </div>
+      
+        <p class="slds-m-vertical_medium content">
+          <!-- Displaying {startingRecord} to {endingRecord} of {totalRecountCount} records. -->
+          Page <span class="page-num">{page}</span> of {totalPage}
+        </p>
+    
+        <div>
+          <lightning-button label="First" icon-name="utility:jump_to_left" onclick={firstHandler}></lightning-button>
+          <lightning-button-group style="margin: 0 10px;">
+            <lightning-button label="Prev" icon-name="utility:chevronleft" onclick={previousHandler}></lightning-button>
+            <lightning-button label="Next" icon-name="utility:chevronright" icon-position="right" onclick={nextHandler}></lightning-button>
+          </lightning-button-group >
+          <lightning-button label="Last" icon-name="utility:jump_to_right" icon-position="right" onclick={lastHandler}></lightning-button>
+        </div>
+      </div>
+  
+      <lightning-datatable
+        key-field="id"
+        data={data}
+        columns={columns}
+        onrowaction={deleteRow}
+        hide-checkbox-column="true">
+      </lightning-datatable>
+  
+      <template if:true={isSpinner}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+      </template>
+    </lightning-card >
+  
+    <lightning-card if:true={error} title="Sensors list">
+      {error}
+    </lightning-card >
   </div>
 </template>
