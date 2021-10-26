@@ -36,7 +36,7 @@ public with sharing class ParkingController {
   }
 
   @AuraEnabled
-  public static void deleteRecord(ID contentDocumentId){
+  public static void deleteRecord(ID recordId){
     // System.debug(contentDocumentId);
   }
 }
