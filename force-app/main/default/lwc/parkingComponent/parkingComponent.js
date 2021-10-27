@@ -6,7 +6,7 @@ import readCSVFile from '@salesforce/apex/ParkingController.readCSVFile';
 const COLUMNS = [
   {label: "Sensor Model", fieldName: "Sensor_Model__c"},
   {label: "Status", fieldName: "Status__c"},
-  {label: "Base Station", fieldName: "Base_Station__c"},
+  {label: "Base Station", fieldName: "Base_Station_Name"},
   {
     type: 'action',
     typeAttributes: { rowActions: [{ label: 'Delete', name: 'delete' }] },
@@ -30,13 +30,12 @@ export default class ParkingComponent extends LightningElement {
   @track isSpinner = false;
   @track comboboxOptions = ComboboxOptions;
 
-  @track page = 1; //this will initialize 1st page
-  @track items = []; //it contains all the records.
-  @track startingRecord = 1; //start record position per page
-  @track endingRecord = 0; //end record position per page
-  // @track pageSize = 10; //default value we are assigning
-  @track totalRecountCount = 0; //total record count received from all retrieved records
-  @track totalPage = 0; //total number of page is needed to display all records
+  @track page = 1;
+  @track items = []; 
+  @track startingRecord = 1;
+  @track endingRecord = 0; 
+  @track totalRecountCount = 0;
+  @track totalPage = 1; 
   
   get acceptedFormats() {
     return ['.csv'];
@@ -50,7 +49,15 @@ export default class ParkingComponent extends LightningElement {
   @wire(getSensorsList) wiredSensors({data, error}) {
     this.isSpinner = false;
     if (data) {
-      this.items = data;
+      let newData = data.map(row => {
+        if (!!row.Base_Station__r) {
+          return {...row, Base_Station_Name: row.Base_Station__r.Name};
+        } else {
+          return row;
+        }
+      });
+      this.items = newData;
+
       this.totalRecountCount = data.length;
       this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize);
       this.data = this.items.slice(0, this.pageSize); 
@@ -105,32 +112,25 @@ export default class ParkingComponent extends LightningElement {
 
     this.data = this.items.slice(this.startingRecord, this.endingRecord);
 
-    this.startingRecord = this.startingRecord + 1;
+    this.startingRecord += 1;
   }    
 
   handleUploadFinished(event) {
     const uploadedFiles = event.detail.files;
     readCSVFile({contentDocumentId: uploadedFiles[0].documentId})
     .then(result => {
-      // console.log(result);
-      // let sensonrsList = [];
-      // result.forEach((sens) => {
-      //   console.log(sens);
-      //   let sensorRecord = {};
-      //   sensorRecord.SensorModel = sens.Sensor_Model__c;
-      //   sensorRecord.Status = sens.Status__c;
-      //   sensorRecord.BaseStationName = sens.Base_Station__c;
-      //   sensonrsList.push(sensorRecord);
-      // });
-      // console.log(result);
-      // this.data = result.map(row => {return {...row, Base_Station__r__Name: row.Base_Station__r.Name}});
-      // this.data = result.map(row => {
-      //   console.log(row);
-      //   console.log(row.Base_Station__r.Name);
-      //   return {...row, BaseStationName: row.Base_Station__r.Name}
-      // });
-      this.data = result;
-      // console.log(this.data);
+      let newData = data.map(row => {
+        if (!!row.Base_Station__r) {
+          return {...row, Base_Station_Name: row.Base_Station__r.Name};
+        } else {
+          return row;
+        }
+      });
+      this.items = newData;
+
+      this.totalRecountCount = result.length;
+      this.page = 1;
+      this.changePage(this.page);
     })
     .catch(err => {
       this.error = err;

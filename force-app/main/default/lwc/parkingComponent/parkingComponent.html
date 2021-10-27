@@ -27,7 +27,6 @@
         </div>
       
         <p class="slds-m-vertical_medium content">
-          <!-- Displaying {startingRecord} to {endingRecord} of {totalRecountCount} records. -->
           Page <span class="page-num">{page}</span> of {totalPage}
         </p>
     
@@ -48,6 +47,10 @@
         onrowaction={deleteRow}
         hide-checkbox-column="true">
       </lightning-datatable>
+
+      <p class="slds-m-around_medium content">
+        Total records: <span class="page-num">{totalRecountCount}</span>
+      </p>
   
       <template if:true={isSpinner}>
         <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>

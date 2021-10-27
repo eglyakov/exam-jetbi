@@ -1,7 +1,7 @@
 public with sharing class ParkingController {
   @AuraEnabled(cacheable=true)
   public static List<Sensor__c> getSensorsList(){
-    return [SELECT Sensor_Model__c, Status__c, Base_Station__c  FROM Sensor__c];
+    return [SELECT Sensor_Model__c, Status__c, Base_Station__r.Name FROM Sensor__c];
   }
 
   @AuraEnabled
@@ -16,8 +16,6 @@ public with sharing class ParkingController {
         Sensor__c sensorObj = new Sensor__c();
         List<String> csvRecordItems = csvRecordsList[i].split(',');
         sensorObj.Base_Station__c = [SELECT Name FROM Base_Station__c WHERE Name =: csvRecordItems[0]].id;
-        //System.debug([SELECT ID FROM Base_Station__c WHERE Name =: csvRecordItems[0]]);
-        //sensorObj.Base_Station__c.Name = csvRecordItems[0];
         sensorObj.Sensor_Model__c = csvRecordItems[1];
         sensorObj.Status__c = csvRecordItems[2];
         sensorsList.add(sensorObj);
@@ -32,7 +30,7 @@ public with sharing class ParkingController {
       }
     }
 
-    return sensorsList;
+    return [SELECT Sensor_Model__c, Status__c, Base_Station__r.Name  FROM Sensor__c];
   }
 
   @AuraEnabled
