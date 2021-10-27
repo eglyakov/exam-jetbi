@@ -1,6 +1,7 @@
 import { LightningElement, track, api, wire } from 'lwc';
 import getSensorsList from '@salesforce/apex/ParkingController.getSensorsList';
 import readCSVFile from '@salesforce/apex/ParkingController.readCSVFile';
+import deleteRecord from '@salesforce/apex/ParkingController.deleteRecord';
 
 
 const COLUMNS = [
@@ -49,6 +50,30 @@ export default class ParkingComponent extends LightningElement {
   @wire(getSensorsList) wiredSensors({data, error}) {
     this.isSpinner = false;
     if (data) {
+      // let newData = data.map(row => {
+      //   if (!!row.Base_Station__r) {
+      //     return {...row, Base_Station_Name: row.Base_Station__r.Name};
+      //   } else {
+      //     return row;
+      //   }
+      // });
+      // this.items = newData;
+
+      // this.totalRecountCount = data.length;
+      this.setData(data);
+
+      // this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize);
+      this.data = this.items.slice(0, this.pageSize); 
+      this.endingRecord = this.pageSize;
+      this.error = undefined;
+    } else if (error) {
+      this.error = error;
+      this.data = [];
+    }
+  }
+
+  updateData(data) {
+    if (data) {
       let newData = data.map(row => {
         if (!!row.Base_Station__r) {
           return {...row, Base_Station_Name: row.Base_Station__r.Name};
@@ -60,12 +85,6 @@ export default class ParkingComponent extends LightningElement {
 
       this.totalRecountCount = data.length;
       this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize);
-      this.data = this.items.slice(0, this.pageSize); 
-      this.endingRecord = this.pageSize;
-      this.error = undefined;
-    } else if (error) {
-      this.error = error;
-      this.data = [];
     }
   }
 
@@ -118,7 +137,7 @@ export default class ParkingComponent extends LightningElement {
   handleUploadFinished(event) {
     const uploadedFiles = event.detail.files;
     readCSVFile({contentDocumentId: uploadedFiles[0].documentId})
-    .then(result => {
+    .then(data => {
       let newData = data.map(row => {
         if (!!row.Base_Station__r) {
           return {...row, Base_Station_Name: row.Base_Station__r.Name};
@@ -128,7 +147,7 @@ export default class ParkingComponent extends LightningElement {
       });
       this.items = newData;
 
-      this.totalRecountCount = result.length;
+      this.totalRecountCount = data.length;
       this.page = 1;
       this.changePage(this.page);
     })
@@ -139,25 +158,9 @@ export default class ParkingComponent extends LightningElement {
   }
 
   deleteRow(event) {
-    const { id } = event.detail.row;
-    const index = this.findRowIndexById(id);
-    if (index !== -1) {
-      this.data = this.data
-        .slice(0, index)
-        .concat(this.data.slice(index + 1));
-    }
-  }
-
-  findRowIndexById(id) {
-    let ret = -1;
-    console.log(id)
-    this.data.some((row, index) => {
-      if (row.id === id) {
-        ret = index;
-        return true;
-      }
-      return false;
-    });
-    return ret;
+    let rowId = event.detail.row.Id;
+    deleteRecord({recordId: rowId});
+    // console.log(event.target.value)
+ 
   }
 }

@@ -30,11 +30,12 @@ public with sharing class ParkingController {
       }
     }
 
-    return [SELECT Sensor_Model__c, Status__c, Base_Station__r.Name  FROM Sensor__c];
+    return [SELECT Sensor_Model__c, Status__c, Base_Station__r.Name FROM Sensor__c];
   }
 
   @AuraEnabled
   public static void deleteRecord(ID recordId){
-    // System.debug(contentDocumentId);
+    Sensor__c sensorDel = [SELECT ID FROM Sensor__c WHERE ID =: recordId];
+    delete sensorDel;
   }
 }
