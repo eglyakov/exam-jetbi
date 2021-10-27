@@ -34,8 +34,9 @@ public with sharing class ParkingController {
   }
 
   @AuraEnabled
-  public static void deleteRecord(ID recordId){
+  public static List<Sensor__c> deleteRecord(ID recordId){
     Sensor__c sensorDel = [SELECT ID FROM Sensor__c WHERE ID =: recordId];
     delete sensorDel;
+    return [SELECT Sensor_Model__c, Status__c, Base_Station__r.Name FROM Sensor__c];
   }
 }
