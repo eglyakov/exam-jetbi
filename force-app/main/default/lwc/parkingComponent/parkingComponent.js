@@ -33,6 +33,7 @@ export default class ParkingComponent extends LightningElement {
   @track comboboxOptions = ComboboxOptions;
 
   @track page = 1;
+  @track pageSize = '25';
   @track items = []; 
   @track startingRecord = 1;
   @track endingRecord = 0; 
@@ -50,15 +51,15 @@ export default class ParkingComponent extends LightningElement {
     .then(res => {
       let isCorrectPageSize = ComboboxOptions.some(elem => elem.value == res);
       if (isCorrectPageSize) this.pageSize = res;
-      else this.pageSize = '25';
+      this.updatePage(this.pageSize);
+      this.isSpinner = false;
     })
     .catch(err => {
       this.error = err;
-    })
+    });
   }
 
   @wire(getSensorsList) wiredSensors({data, error}) {
-    this.isSpinner = false;
     if (data) { 
       this.updateData(data);
       this.data = this.items.slice(0, this.pageSize); 
@@ -68,6 +69,7 @@ export default class ParkingComponent extends LightningElement {
       this.error = error;
       this.data = [];
     }
+    this.isSpinner = false;
   }
 
   handleUploadFinished(event) {
@@ -94,12 +96,12 @@ export default class ParkingComponent extends LightningElement {
       });
       this.items = newData;
       this.totalRecountCount = data.length;
-      this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize);
+      this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize) || 1;
     }
   }
 
   updatePage(page) {
-    this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize);
+    this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize) || 1;
 
     this.startingRecord = (page - 1) * this.pageSize ;
     this.endingRecord = this.pageSize * page;
