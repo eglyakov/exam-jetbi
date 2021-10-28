@@ -39,4 +39,12 @@ public with sharing class ParkingController {
     delete sensorDel;
     return [SELECT Sensor_Model__c, Status__c, Base_Station__r.Name FROM Sensor__c];
   }
+
+  @AuraEnabled
+  public static String getRecordsPerPage(){
+    Id userId = UserInfo.getUserId();
+    RecordsPerPage__c userCS = RecordsPerPage__c.getInstance(userId);
+    String userDisplayRecord = userCS.Display_Record_Per_Page__c;
+    return userDisplayRecord;
+  }
 }

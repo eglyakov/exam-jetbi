@@ -2,6 +2,7 @@ import { LightningElement, track, api, wire } from 'lwc';
 import getSensorsList from '@salesforce/apex/ParkingController.getSensorsList';
 import readCSVFile from '@salesforce/apex/ParkingController.readCSVFile';
 import deleteRecord from '@salesforce/apex/ParkingController.deleteRecord';
+import getRecordsPerPage from '@salesforce/apex/ParkingController.getRecordsPerPage';
 
 
 const COLUMNS = [
@@ -44,12 +45,21 @@ export default class ParkingComponent extends LightningElement {
 
   connectedCallback() {
     this.isSpinner = true;
-    this.pageSize = '25';
+
+    getRecordsPerPage()
+    .then(res => {
+      let isCorrectPageSize = ComboboxOptions.some(elem => elem.value == res);
+      if (isCorrectPageSize) this.pageSize = res;
+      else this.pageSize = '25';
+    })
+    .catch(err => {
+      this.error = err;
+    })
   }
 
   @wire(getSensorsList) wiredSensors({data, error}) {
     this.isSpinner = false;
-    if (data) {
+    if (data) { 
       this.updateData(data);
       this.data = this.items.slice(0, this.pageSize); 
       this.endingRecord = this.pageSize;
@@ -88,6 +98,35 @@ export default class ParkingComponent extends LightningElement {
     }
   }
 
+  updatePage(page) {
+    this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize);
+
+    this.startingRecord = (page - 1) * this.pageSize ;
+    this.endingRecord = this.pageSize * page;
+    this.endingRecord = (this.endingRecord > this.totalRecountCount) ? this.totalRecountCount : this.endingRecord; 
+
+    this.data = this.items.slice(this.startingRecord, this.endingRecord);
+    console.log(getRecordsPerPage())
+  }    
+
+  deleteRow(event) {
+    this.isSpinner = true;
+    let rowId = event.detail.row.Id;
+    deleteRecord({recordId: rowId})
+    .then(data => {
+      this.updateData(data);
+      if (this.page > this.totalPage) {
+        this.page = this.totalPage
+      }
+      this.updatePage(this.page);
+      this.isSpinner = false;
+
+    })
+    .catch(err => {
+      this.error = err;
+    });
+  }
+
   comboboxChangeHandler(event) {
     this.pageSize = event.target.value;
     this.page = 1;
@@ -120,33 +159,5 @@ export default class ParkingComponent extends LightningElement {
       this.page = this.totalPage; 
       this.updatePage(this.page);            
     }   
-  }
-
-  updatePage(page) {
-    this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize);
-
-    this.startingRecord = (page - 1) * this.pageSize ;
-    this.endingRecord = this.pageSize * page;
-    this.endingRecord = (this.endingRecord > this.totalRecountCount) ? this.totalRecountCount : this.endingRecord; 
-
-    this.data = this.items.slice(this.startingRecord, this.endingRecord);
-  }    
-
-  deleteRow(event) {
-    this.isSpinner = true;
-    let rowId = event.detail.row.Id;
-    deleteRecord({recordId: rowId})
-    .then(data => {
-      this.updateData(data);
-      if (this.page > this.totalPage) {
-        this.page = this.totalPage
-      }
-      this.updatePage(this.page);
-      this.isSpinner = false;
-
-    })
-    .catch(err => {
-      this.error = err;
-    });
   }
 }
