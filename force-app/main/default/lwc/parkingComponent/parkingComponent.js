@@ -36,7 +36,7 @@ export default class ParkingComponent extends LightningElement {
   @track pageSize = '25';
   @track items = []; 
   @track startingRecord = 1;
-  @track endingRecord = 0; 
+  @track endingRecord = +this.pageSize; 
   @track totalRecountCount = 0;
   @track totalPage = 1; 
   
@@ -51,7 +51,7 @@ export default class ParkingComponent extends LightningElement {
     .then(res => {
       let isCorrectPageSize = ComboboxOptions.some(elem => elem.value == res);
       if (isCorrectPageSize) this.pageSize = res;
-      this.updatePage(this.pageSize);
+      this.updatePage(this.page);
       this.isSpinner = false;
     })
     .catch(err => {
@@ -85,6 +85,7 @@ export default class ParkingComponent extends LightningElement {
     })
   }
 
+
   updateData(data) {
     if (data) {
       let newData = data.map(row => {
@@ -102,13 +103,10 @@ export default class ParkingComponent extends LightningElement {
 
   updatePage(page) {
     this.totalPage = Math.ceil(this.totalRecountCount / this.pageSize) || 1;
-
     this.startingRecord = (page - 1) * this.pageSize ;
     this.endingRecord = this.pageSize * page;
     this.endingRecord = (this.endingRecord > this.totalRecountCount) ? this.totalRecountCount : this.endingRecord; 
-
     this.data = this.items.slice(this.startingRecord, this.endingRecord);
-    console.log(getRecordsPerPage())
   }    
 
   deleteRow(event) {
